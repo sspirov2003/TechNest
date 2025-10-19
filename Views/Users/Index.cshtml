@@ -1,0 +1,17 @@
+@model IEnumerable<string>
+@{
+    ViewData["Title"] = "Users & Roles";
+}
+<h1>Users & Roles</h1>
+
+<div class="alert alert-secondary">
+    This page will list users by role and allow role management later.
+</div>
+
+<h5>Roles available:</h5>
+<ul>
+@foreach (var role in Model)
+{
+    <li>@role</li>
+}
+</ul>

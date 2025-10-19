@@ -1,0 +1,29 @@
+@model IEnumerable<TechNestClean.Models.Order>
+@{
+    ViewData["Title"] = "Orders";
+}
+<h1>Orders</h1>
+
+<div class="alert alert-warning">@ViewBag.RoleMessage</div>
+
+<p>
+    <a class="btn btn-secondary disabled" href="#" aria-disabled="true" title="Placeholder only">
+        View Orders
+    </a>
+</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Order #</th>
+        <th>User</th>
+        <th>Product</th>
+        <th>Date (UTC)</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td colspan="4"><em>No orders yet — structure is ready.</em></td>
+    </tr>
+    </tbody>
+</table>

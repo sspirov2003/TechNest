@@ -1,0 +1,22 @@
+# Build folders
+bin/
+obj/
+
+# SQLite database
+*.db
+
+# User-specific files
+*.user
+*.suo
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Secrets and local config
+appsettings.Development.json

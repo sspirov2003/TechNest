@@ -1,0 +1,74 @@
+@model IEnumerable<TechNestClean.Models.Product>
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<h1>Available Products</h1>
+
+<div class="mb-3">
+    <input type="text" id="searchBox" class="form-control" placeholder="Search for products..." value="@ViewBag.Query" />
+    <ul id="suggestions" class="list-group position-absolute mt-1" style="z-index:1000; width: 300px;"></ul>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+@foreach (var product in Model)
+{
+    <div class="col">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">@product.Name</h5>
+                <p class="card-text text-muted mb-2">Price: @product.Price.ToString("C")</p>
+                 <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.Id" method="post">
+                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                         🛒 Add to Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+</div>
+
+@section Scripts {
+<script>
+    const searchBox = document.getElementById("searchBox");
+    const suggestions = document.getElementById("suggestions");
+
+    searchBox.addEventListener("input", async (e) => {
+        const q = e.target.value.trim();
+        if (q.length === 0) {
+            suggestions.innerHTML = "";
+            return;
+        }
+
+        const response = await fetch(`/Shop/Search?q=${encodeURIComponent(q)}`);
+        const results = await response.json();
+
+        suggestions.innerHTML = results
+            .map(r => `<li class="list-group-item list-group-item-action">${r}</li>`)
+            .join("");
+
+        Array.from(suggestions.children).forEach(item => {
+            item.addEventListener("click", () => {
+                searchBox.value = item.textContent;
+                suggestions.innerHTML = "";
+                searchProducts();
+            });
+        });
+    });
+
+    searchBox.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            searchProducts();
+        }
+    });
+
+    function searchProducts() {
+        const query = searchBox.value.trim();
+        if (query.length > 0) {
+            window.location.href = `/Shop?query=${encodeURIComponent(query)}`;
+        }
+    }
+</script>
+}
