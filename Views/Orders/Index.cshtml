@@ -1,29 +1,65 @@
 @model IEnumerable<TechNestClean.Models.Order>
 @{
-    ViewData["Title"] = "Orders";
+    ViewData["Title"] = "All Orders";
+    var statuses = ViewBag.Statuses as List<TechNestClean.Models.OrderStatus>;
 }
-<h1>Orders</h1>
 
-<div class="alert alert-warning">@ViewBag.RoleMessage</div>
+<h1>All Orders</h1>
 
-<p>
-    <a class="btn btn-secondary disabled" href="#" aria-disabled="true" title="Placeholder only">
-        View Orders
-    </a>
-</p>
+@if (!Model.Any())
+{
+    <p>No orders found.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Product</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th style="width:260px;">Change Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var o in Model)
+        {
+            var status = o.OrderStatus?.Name ?? "Unknown";
+            var badgeClass = status switch
+            {
+                "Processing" => "bg-warning text-dark",
+                "Shipped out" => "bg-info text-dark",
+                "Delivered" => "bg-success",
+                _ => "bg-secondary"
+            };
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Order #</th>
-        <th>User</th>
-        <th>Product</th>
-        <th>Date (UTC)</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td colspan="4"><em>No orders yet — structure is ready.</em></td>
-    </tr>
-    </tbody>
-</table>
+            <tr>
+                <td>@o.AppUser?.Name</td>
+                <td>@o.Product?.Name</td>
+                <td>@o.OrderDate.ToLocalTime().ToString("g")</td>
+                <td>
+                    <span class="badge @badgeClass">@status</span>
+                </td>
+                <td>
+                    <form asp-action="UpdateStatus" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@o.Id" />
+                        <select name="statusId" class="form-select form-select-sm">
+                            @if (statuses != null)
+                            {
+                                @foreach (var s in statuses)
+                                {
+                                    <option value="@s.Id" selected="@(s.Id == o.OrderStatusId)">
+                                        @s.Name
+                                    </option>
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

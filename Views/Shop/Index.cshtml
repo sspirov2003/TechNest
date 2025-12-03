@@ -1,47 +1,95 @@
 @model IEnumerable<TechNestClean.Models.Product>
 @{
-    ViewData["Title"] = "Shop";
+    ViewData["Title"] = "Available Products";
 }
 
-<h1>Available Products</h1>
+<h1>@ViewData["Title"]</h1>
 
-<div class="mb-3">
-    <input type="text" id="searchBox" class="form-control" placeholder="Search for products..." value="@ViewBag.Query" />
-    <ul id="suggestions" class="list-group position-absolute mt-1" style="z-index:1000; width: 300px;"></ul>
-</div>
-
-<div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
-@foreach (var product in Model)
-{
-    <div class="col">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">@product.Name</h5>
-                <p class="card-text text-muted mb-2">Price: @product.Price.ToString("C")</p>
-                 <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.Id" method="post">
-                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                         🛒 Add to Cart
-                    </button>
-                </form>
-            </div>
+<div class="container mt-4">
+    <!-- Search + Category Filter -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <select id="categorySelect" class="form-select">
+                <option value="0">All Categories</option>
+                @foreach (var category in (SelectList)ViewBag.Categories)
+                {
+                    <option value="@category.Value"
+                            selected="@(ViewBag.SelectedCategory == int.Parse(category.Value))">
+                        @category.Text
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-9 position-relative">
+            <input type="text" id="searchBox" class="form-control"
+                   placeholder="Search for products..."
+                   value="@ViewBag.Query" />
+            <ul id="suggestions"
+                class="list-group position-absolute mt-1"
+                style="z-index:1000; width:100%;"></ul>
         </div>
     </div>
-}
+
+    <!-- Product Grid -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning text-center mt-4">
+            No products found. Please try a different search or category.
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        @if (!string.IsNullOrWhiteSpace(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl"
+                                 class="card-img-top"
+                                 alt="@product.Name"
+                                 style="width:100%; height:220px; object-fit:contain; background-color:#f8f9fa;" />
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@product.Name</h5>
+                            @if (product.Category != null)
+                            {
+                                <span class="badge bg-secondary mb-2">@product.Category.Name</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(product.Description))
+                            {
+                                <p class="card-text text-muted flex-grow-1">@product.Description</p>
+                            }
+                            <p class="fw-bold mt-auto">@product.Price.ToString("C")</p>
+                            <form asp-controller="Cart" asp-action="Add" asp-route-id="@product.Id" method="post">
+                                <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                    🛒 Add to Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @section Scripts {
 <script>
     const searchBox = document.getElementById("searchBox");
     const suggestions = document.getElementById("suggestions");
+    const categorySelect = document.getElementById("categorySelect");
 
     searchBox.addEventListener("input", async (e) => {
         const q = e.target.value.trim();
+        const categoryId = categorySelect.value;
         if (q.length === 0) {
             suggestions.innerHTML = "";
             return;
         }
 
-        const response = await fetch(`/Shop/Search?q=${encodeURIComponent(q)}`);
+        const response = await fetch(`/Shop/Search?q=${encodeURIComponent(q)}&categoryId=${categoryId}`);
         const results = await response.json();
 
         suggestions.innerHTML = results
@@ -64,11 +112,13 @@
         }
     });
 
+    categorySelect.addEventListener("change", () => searchProducts());
+
     function searchProducts() {
         const query = searchBox.value.trim();
-        if (query.length > 0) {
-            window.location.href = `/Shop?query=${encodeURIComponent(query)}`;
-        }
+        const categoryId = categorySelect.value;
+        const url = `/Shop?query=${encodeURIComponent(query)}&categoryId=${categoryId}`;
+        window.location.href = url;
     }
 </script>
 }

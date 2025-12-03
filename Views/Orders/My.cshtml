@@ -1,0 +1,44 @@
+@model IEnumerable<TechNestClean.Models.Order>
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<h1>My Orders</h1>
+
+@if (!Model.Any())
+{
+    <p>You have no orders yet.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Product</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var o in Model)
+        {
+            var status = o.OrderStatus?.Name ?? "Unknown";
+            var badgeClass = status switch
+            {
+                "Processing" => "bg-warning text-dark",
+                "Shipped out" => "bg-info text-dark",
+                "Delivered" => "bg-success",
+                _ => "bg-secondary"
+            };
+
+            <tr>
+                <td>@o.OrderDate.ToLocalTime().ToString("g")</td>
+                <td>@o.Product?.Name</td>
+                <td>
+                    <span class="badge @badgeClass">@status</span>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

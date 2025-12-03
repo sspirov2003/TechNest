@@ -1,9 +1,15 @@
-@model List<TechNestClean.Models.CartItem>
+@model IEnumerable<TechNestClean.Models.CartItem>
+
 @{
     ViewData["Title"] = "Your Cart";
 }
 
 <h1>Your Cart</h1>
+
+@if (TempData["CartMessage"] != null)
+{
+    <div class="alert alert-info">@TempData["CartMessage"]</div>
+}
 
 @if (!Model.Any())
 {
@@ -11,24 +17,30 @@
 }
 else
 {
+    decimal total = 0m;
+
     <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Product</th>
-                <th>Price</th>
-                <th>Quantity</th>
-                <th>Total</th>
-                <th></th>
+                <th style="width:120px;">Price</th>
+                <th style="width:100px;">Quantity</th>
+                <th style="width:140px;">Total</th>
+                <th style="width:80px;"></th>
             </tr>
         </thead>
         <tbody>
         @foreach (var item in Model)
         {
+            var price = item.Product?.Price ?? 0m;
+            var rowTotal = price * item.Quantity;
+            total += rowTotal;
+
             <tr>
-                <td>@item.ProductName</td>
-                <td>@item.Price.ToString("C")</td>
+                <td>@item.Product?.Name</td>
+                <td>@price.ToString("C")</td>
                 <td>@item.Quantity</td>
-                <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                <td>@rowTotal.ToString("C")</td>
                 <td>
                     <form asp-action="Remove" asp-route-id="@item.ProductId" method="post" class="d-inline">
                         <button type="submit" class="btn btn-danger btn-sm">Remove</button>
@@ -39,9 +51,35 @@ else
         </tbody>
     </table>
 
-    <h4>Total: <strong>@((ViewBag.Total).ToString("C"))</strong></h4>
+    <h4>Total: <strong>@total.ToString("C")</strong></h4>
 
-    <form asp-action="Clear" method="post">
+    <form asp-action="Clear" method="post" class="mt-2">
         <button type="submit" class="btn btn-outline-secondary">Clear Cart</button>
+    </form>
+
+    <hr />
+
+    <!-- Promo code form -->
+    <form asp-action="ApplyPromoCode" method="post" class="d-flex gap-2 mb-3 mt-3">
+        <input type="text" name="code" class="form-control" placeholder="Enter promo code..." />
+        <button type="submit" class="btn btn-outline-success">Apply</button>
+    </form>
+
+    @if (TempData["PromoMessage"] != null)
+    {
+        <div class="alert alert-info">@TempData["PromoMessage"]</div>
+    }
+
+    @if (TempData["DiscountPercent"] != null)
+    {
+        var discount = Convert.ToInt32(TempData["DiscountPercent"]);
+        var discounted = total - (total * discount / 100m);
+
+        <h5>Discount: <strong>@discount %</strong></h5>
+        <h4>Total After Discount: <strong>@discounted.ToString("C")</strong></h4>
+    }
+
+    <form asp-action="PlaceOrder" method="post" class="mt-3">
+        <button type="submit" class="btn btn-success">Place Order</button>
     </form>
 }

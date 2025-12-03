@@ -13,21 +13,22 @@ public class ProductsController : Controller
         _context = context;
     }
 
-    // GET: /Products
+
     public IActionResult Index()
     {
         var products = _context.Products.ToList();
         return View(products);
     }
 
-    // GET: /Products/Create
+
     [HttpGet]
     public IActionResult Create()
     {
+        ViewBag.Categories = _context.Categories.ToList();
         return View();
     }
 
-    // POST: /Products/Create
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Create(Product product)
@@ -42,7 +43,7 @@ public class ProductsController : Controller
         return View(product);
     }
 
-    // GET: /Products/Delete/5
+
     [HttpGet]
     public IActionResult Delete(int id)
     {
@@ -53,7 +54,7 @@ public class ProductsController : Controller
         return View(product);
     }
 
-// POST: /Products/Delete/5
+
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     public IActionResult DeleteConfirmed(int id)
@@ -62,10 +63,36 @@ public class ProductsController : Controller
         if (product == null)
             return NotFound();
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+        _context.Products.Remove(product);
+        _context.SaveChanges();
         return RedirectToAction(nameof(Index));
     }
+
+
+    [HttpGet]
+    public IActionResult Edit(int id)
+    {
+        var product = _context.Products.FirstOrDefault(p => p.Id == id);
+        if (product == null)
+            return NotFound();
+
+        ViewBag.Categories = _context.Categories.ToList();
+        return View(product);
+    }
+
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult Edit(Product product)
+    {
+        if (!ModelState.IsValid)
+            return View(product);
+
+        _context.Products.Update(product);
+        _context.SaveChanges();
+        return RedirectToAction(nameof(Index));
+    }
+
 
 }
 

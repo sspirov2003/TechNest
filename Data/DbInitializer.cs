@@ -21,8 +21,21 @@ public static class DbInitializer
             context.Users.AddRange(users);
             context.SaveChanges();
         }
+        // Seed Categories
+        if (!context.Categories.Any())
+        {
+            var categories = new[]
+            {
+                new Category { Name = "Laptops" },
+                new Category { Name = "Accessories" },
+                new Category { Name = "Smartphones" },
+                new Category { Name = "Peripherals" }
+         };
+            context.Categories.AddRange(categories);
+            context.SaveChanges();
+        }
 
-        // Seed Products
+
         if (!context.Products.Any())
         {
             var products = new[]
@@ -37,7 +50,7 @@ public static class DbInitializer
             context.SaveChanges();
         }
 
-        // Seed Orders
+
         if (!context.Orders.Any())
         {
             var firstUser = context.Users.First(u => u.Name == "Charlie");
@@ -50,5 +63,62 @@ public static class DbInitializer
             context.Orders.AddRange(orders);
             context.SaveChanges();
         }
+
+
+        if (!context.PromoCodes.Any())
+        {
+            var promoCodes = new[]
+            {
+                new PromoCode
+                {
+                    Code = "SAVE10",
+                    DiscountPercent = 10,
+                    ExpiryDate = DateTime.Now.AddMonths(1),
+                    IsActive = true
+                },
+                new PromoCode
+                {
+                    Code = "STUDENT15",
+                    DiscountPercent = 15,
+                    ExpiryDate = DateTime.Now.AddMonths(2),
+                    IsActive = true
+                },
+                new PromoCode
+                {
+                    Code = "WELCOME5",
+                    DiscountPercent = 5,
+                    ExpiryDate = DateTime.Now.AddYears(1),
+                    IsActive = true
+                }
+            };
+
+            context.PromoCodes.AddRange(promoCodes);
+            context.SaveChanges();
+        }
+        // Seed Order Statuses
+        if (!context.OrderStatuses.Any())
+        {
+            var statuses = new[]
+            {
+                new OrderStatus { Name = "Processing" },
+                new OrderStatus { Name = "Shipped out" },
+                new OrderStatus { Name = "Delivered" }
+            };
+            context.OrderStatuses.AddRange(statuses);
+            context.SaveChanges();
+        }
+        // Seed Order Statuses
+        if (!context.OrderStatuses.Any())
+        {
+            var statuses = new[]
+            {
+                new OrderStatus { Name = "Processing" },
+                new OrderStatus { Name = "Shipped out" },
+                new OrderStatus { Name = "Delivered" }
+            };
+            context.OrderStatuses.AddRange(statuses);
+            context.SaveChanges();
+        }
+
     }
 }

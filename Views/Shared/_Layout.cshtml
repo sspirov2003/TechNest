@@ -2,15 +2,27 @@
     Layout = null;
 }
 
-@using TechNestClean.Models
+@* @using TechNestClean.Models
 @{
     var roleString = Context.Session.GetString("UserRole") ?? "User";
     Enum.TryParse<UserRole>(roleString, out var currentRole);
-}
+} *@
+@using TechNestClean.Models
+@{
+    var roleString = Context.Session.GetString("UserRole");
+    UserRole? currentRole = null;
 
+    if (!string.IsNullOrEmpty(roleString) && Enum.TryParse<UserRole>(roleString, out var parsedRole))
+    {
+        currentRole = parsedRole;
+    }
+
+    var currentUserName = Context.Session.GetString("CurrentUserName");
+}
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,13 +30,14 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm">
             <div class="container-fluid">
                 <a class="navbar-brand fw-bold text-primary" asp-controller="Home" asp-action="Index">TechNest</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -38,6 +51,9 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Products" asp-action="Index">Products</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Users" asp-action="Index">User Management</a>
                             </li>
                         }
 
@@ -57,25 +73,50 @@
                                 <span class="navbar-text fw-bold me-2">User</span>
                             </li>
                             <li class="nav-item">
-                                 <a class="nav-link" asp-controller="Shop" asp-action="Index">Shop</a>
-                             </li>
+                                <a class="nav-link" asp-controller="Shop" asp-action="Index">Shop</a>
+                            </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Users" asp-action="Index">Users</a>
+                                <a class="nav-link" asp-controller="Cart" asp-action="Index">Cart</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Orders" asp-action="My">My Orders</a>
                             </li>
                         }
-
                     </ul>
 
 
                     <!-- Reserved space for future creative add-ons -->
-                    <ul class="navbar-nav mb-2 mb-lg-0">
+                    @* <ul class="navbar-nav mb-2 mb-lg-0">
                         <form class="d-flex" asp-controller="Role" asp-action="Set" method="get">
                             <select class="form-select form-select-sm me-2" name="role" onchange="this.form.submit()">
                                 <option value="Admin" selected="@(currentRole == UserRole.Admin)">Admin</option>
-                                <option value="Moderator" selected="@(currentRole == UserRole.Moderator)">Moderator</option>
+                                <option value="Moderator" selected="@(currentRole == UserRole.Moderator)">Moderator
+                                </option>
                                 <option value="User" selected="@(currentRole == UserRole.User)">User</option>
                             </select>
                         </form>
+                    </ul> *@
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        @if (string.IsNullOrEmpty(currentUserName))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Register">Register</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text me-2">Hello, @currentUserName</span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link nav-link p-0">Logout</button>
+                                </form>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -98,4 +139,5 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
+
 </html>

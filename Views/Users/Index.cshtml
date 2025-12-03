@@ -1,17 +1,50 @@
-@model IEnumerable<string>
+@model IEnumerable<TechNestClean.Models.AppUser>
 @{
-    ViewData["Title"] = "Users & Roles";
+    ViewData["Title"] = "User & Role Management";
 }
-<h1>Users & Roles</h1>
 
-<div class="alert alert-secondary">
-    This page will list users by role and allow role management later.
-</div>
+<h1>User &amp; Role Management</h1>
 
-<h5>Roles available:</h5>
-<ul>
-@foreach (var role in Model)
+<p class="text-muted">
+    Only admins can manage roles. Use the dropdowns below to change a user’s role.
+</p>
+
+@if (TempData["UserRoleMessage"] != null)
 {
-    <li>@role</li>
+    <div class="alert alert-info">
+        @TempData["UserRoleMessage"]
+    </div>
 }
-</ul>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Current Role</th>
+            <th style="width: 260px;">Change Role</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Name</td>
+            <td>@user.Role</td>
+            <td>
+                <form asp-action="UpdateRole" method="post" class="d-flex gap-2 align-items-center">
+                    <input type="hidden" name="id" value="@user.Id" />
+                    <select name="role" class="form-select form-select-sm">
+                        @foreach (TechNestClean.Models.UserRole r in Enum.GetValues(typeof(TechNestClean.Models.UserRole)))
+                        {
+                            <option value="@r" selected="@(user.Role == r)">
+                                @r
+                            </option>
+                        }
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

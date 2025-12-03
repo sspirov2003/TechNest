@@ -12,7 +12,6 @@ public class RoleController : Controller
             HttpContext.Session.SetString("UserRole", parsedRole.ToString());
         }
 
-        // ✅ Redirect somewhere that definitely exists:
         return RedirectToAction("Index", "Products");
     }
 }
