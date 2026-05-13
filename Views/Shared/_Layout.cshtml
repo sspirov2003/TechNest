@@ -55,6 +55,9 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Users" asp-action="Index">User Management</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="PromoCodes" asp-action="Index">Promo Codes</a>
+                            </li>
                         }
 
                         @if (currentRole == UserRole.Moderator)
@@ -69,9 +72,6 @@
 
                         @if (currentRole == UserRole.User)
                         {
-                            <li class="nav-item">
-                                <span class="navbar-text fw-bold me-2">User</span>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Shop" asp-action="Index">Shop</a>
                             </li>
